@@ -1,0 +1,16 @@
+# Virtual environment
+.venv/
+__pycache__/
+
+# Environment variables
+.env
+
+# Database
+bookings.db
+
+# Generated files
+*.pdf
+*.docx
+
+# Python cache
+*.pyc

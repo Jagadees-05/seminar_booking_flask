@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ hall }} - Book Slot</title>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<style>
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:url("{{ url_for('static', filename=bg_image) }}");
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+color:white;
+text-align:center;
+position:relative;
+}
+
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.25);
+z-index:-1;
+}
+
+h1{
+margin-top:40px;
+font-size:40px;
+}
+
+.form-container input{
+padding:12px;
+margin:10px;
+width:220px;
+border-radius:10px;
+border:none;
+}
+
+.slot-grid{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:60px;
+gap:30px;
+}
+
+.slot-card{
+width:200px;
+height:130px;
+border-radius:20px;
+background:#2f3f52;
+box-shadow:8px 8px 15px #1b2635,
+-8px -8px 15px #3e556e;
+transition:0.4s ease;
+cursor:pointer;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.slot-card:hover{
+transform:translateY(-10px) scale(1.05);
+box-shadow:0 0 20px #00ffe7;
+}
+
+.slot-card.booked{
+background:#3c2f3f;
+}
+
+.slot-card.waiting{
+background:#6b5f2a;
+}
+
+.slot-card h3{
+margin:0;
+font-size:20px;
+}
+
+.slot-card p{
+margin-top:10px;
+font-size:14px;
+}
+
+/* MODAL */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.hidden{
+display:none;
+}
+
+.modal-content{
+background:#1e2c3b;
+padding:30px;
+border-radius:20px;
+width:320px;
+}
+
+.modal-content input,
+.modal-content textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:10px;
+border:none;
+}
+
+.modal-content button{
+margin-top:15px;
+padding:10px;
+width:100%;
+border:none;
+border-radius:10px;
+background:#00ffe7;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>{{ hall }} - Book Slot</h1>
+
+<div class="form-container">
+<input type="text" id="datePicker" placeholder="Select Date">
+<input type="text" id="name" placeholder="Name">
+<input type="text" id="dept" placeholder="Dept">
+</div>
+
+<div class="slot-grid" id="slots"></div>
+
+<div id="bookingModal" class="modal hidden">
+<div class="modal-content">
+<h3>Booking Details</h3>
+<input type="text" id="eventName" placeholder="Event Name">
+<input type="email" id="email" placeholder="Email">
+<textarea id="purpose" placeholder="Purpose"></textarea>
+<button onclick="submitBooking()">Confirm</button>
+<button onclick="closeModal()">Cancel</button>
+</div>
+</div>
+
+<script>
+
+const hall="{{ hall }}";
+let selectedSlot="";
+
+const SLOTS=[
+"9-10 AM","10-11 AM","11-12 PM",
+"12-1 PM","1-2 PM","2-3 PM","3-4 PM",
+"Half Day (Morning)","Half Day (Afternoon)","Full Day"
+];
+
+flatpickr("#datePicker",{
+minDate:"today",
+dateFormat:"Y-m-d",
+onChange:loadSlots
+});
+
+async function loadSlots(){
+
+const date=document.getElementById("datePicker").value;
+if(!date)return;
+
+const res=await fetch(`/api/slot-status?hall=${hall}&date=${date}`);
+const slotStatus=await res.json();
+
+const div=document.getElementById("slots");
+div.innerHTML="";
+
+SLOTS.forEach(slot=>{
+
+const card=document.createElement("div");
+card.className="slot-card";
+
+const status=slotStatus[slot];
+
+if(status==="approved"){
+card.classList.add("booked");
+card.innerHTML=`<h3>${slot}</h3><p>Booked</p>`;
+}
+else if(status==="waiting"){
+card.classList.add("waiting");
+card.innerHTML=`<h3>${slot}</h3><p>Waiting</p>`;
+}
+else{
+card.innerHTML=`<h3>${slot}</h3><p>Available</p>`;
+card.onclick=()=>openModal(slot);
+}
+
+div.appendChild(card);
+
+});
+
+}
+
+setInterval(loadSlots,5000);
+
+function openModal(slot){
+selectedSlot=slot;
+document.getElementById("bookingModal").classList.remove("hidden");
+}
+
+function closeModal(){
+document.getElementById("bookingModal").classList.add("hidden");
+}
+
+async function submitBooking(){
+
+const date=document.getElementById("datePicker").value;
+const name=document.getElementById("name").value.trim();
+const dept=document.getElementById("dept").value.trim();
+const eventName=document.getElementById("eventName").value.trim();
+const email=document.getElementById("email").value.trim();
+const purpose=document.getElementById("purpose").value.trim();
+
+if(!date||!name||!dept||!eventName||!email||!purpose){
+alert("Please fill all fields properly.");
+return;
+}
+
+const res=await fetch("/api/book",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+hall,
+date,
+slot:selectedSlot,
+booking_type:selectedSlot,
+event_name:eventName,
+name,
+dept,
+email,
+purpose
+})
+});
+
+const data=await res.json();
+
+if(!res.ok){
+alert(data.message);
+return;
+}
+
+closeModal();
+loadSlots();
+alert(data.message);
+}
+
+</script>
+
+</body>
+</html>

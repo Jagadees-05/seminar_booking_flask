@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+
+<style>
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.login-box{
+background:#1e2c3b;
+padding:45px;
+border-radius:20px;
+box-shadow:0 0 35px rgba(0,255,231,0.3);
+text-align:center;
+width:340px;
+transition:0.2s;
+}
+
+.input-group{
+position:relative;
+margin:15px 0;
+}
+
+input{
+width:100%;
+padding:12px 45px 12px 12px;
+border-radius:10px;
+border:none;
+outline:none;
+font-size:14px;
+box-sizing:border-box;
+}
+
+.eye{
+position:absolute;
+right:12px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#19d3c5;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+margin-top:15px;
+font-size:15px;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 15px #19d3c5;
+}
+
+h2{
+margin-bottom:25px;
+}
+
+.error{
+color:#ff4d4d;
+margin-top:10px;
+font-size:14px;
+}
+
+/* Shake animation */
+.shake {
+animation: shake 0.3s;
+}
+
+@keyframes shake {
+0% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+50% { transform: translateX(5px); }
+75% { transform: translateX(-5px); }
+100% { transform: translateX(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box {% if error %}shake{% endif %}">
+<h2>🔐 Admin Login</h2>
+
+<form method="POST" action="{{ url_for('admin_login') }}">
+
+<div class="input-group">
+<input 
+    type="text"
+    name="username" 
+    placeholder="Username" 
+    value="{{ request.form.username if request.form.username else '' }}"
+    required>
+</div>
+
+<div class="input-group">
+<input 
+    type="password" 
+    id="password" 
+    name="password" 
+    placeholder="Password" 
+    required>
+
+<span class="eye" onclick="togglePassword()">
+
+<svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+<path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
+</svg>
+
+<svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" style="display:none;">
+<path d="M2 2l20 20M9.88 9.88A3 3 0 0114.12 14.12M12 5c7 0 11 7 11 7a17.39 17.39 0 01-5.12 5.88M4.88 4.88A17.39 17.39 0 001 12s4 7 11 7a10.8 10.8 0 004.12-.88"/>
+</svg>
+
+</span>
+</div>
+
+<button type="submit">Login</button>
+
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
+
+</form>
+
+</div>
+
+<script>
+function togglePassword(){
+const passwordField = document.getElementById("password");
+const eyeOpen = document.getElementById("eyeOpen");
+const eyeClosed = document.getElementById("eyeClosed");
+
+if(passwordField.type === "password"){
+passwordField.type = "text";
+eyeOpen.style.display = "none";
+eyeClosed.style.display = "inline";
+} else {
+passwordField.type = "password";
+eyeOpen.style.display = "inline";
+eyeClosed.style.display = "none";
+}
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Seminar Hall Booking</title>
+
+    <style>
+        body{
+            margin:0;
+            font-family:'Segoe UI',sans-serif;
+            background:url("{{ url_for('static', filename='home_bg.jpg') }}");
+            background-size:100%;
+            background-position:center;
+            background-attachment:fixed;
+            color:white;
+            text-align:center;
+            position:relative;
+        }
+
+        /* Dark overlay for readability */
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        rgba(0,0,0,0.35),
+        rgba(0,0,0,0.55)
+    );
+    z-index:-1;
+}
+
+  .title{
+    padding-top:60px;
+    font-size:42px;
+    letter-spacing:1px;
+    text-shadow:0 3px 15px rgba(0,0,0,0.8);
+}
+
+        .hall-container{
+            display:flex;
+            justify-content:center;
+            gap:40px;
+            flex-wrap:wrap;
+            margin-top:70px;
+        }
+
+  .hall-card{
+    width:300px;
+    padding:45px 25px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:0.4s ease;
+
+    background:rgba(0, 30, 60, 0.75);  /* dark glass look */
+    border:1px solid rgba(255,255,255,0.3);
+
+    box-shadow:0 15px 35px rgba(0,0,0,0.6);
+}
+
+.hall-card:hover{
+    transform:translateY(-10px) scale(1.05);
+    box-shadow:0 0 25px #19d3c5;
+    border:1px solid #19d3c5;
+}
+
+        .hall-card h2{
+            margin:0 0 15px 0;
+        }
+
+        .hall-card p{
+            font-size:16px;
+            opacity:0.9;
+        }
+
+        .admin-link{
+            display:inline-block;
+            margin-top:70px;
+            color:#19d3c5;
+            font-weight:bold;
+            text-decoration:none;
+            transition:0.3s;
+        }
+
+        .admin-link:hover{
+            color:white;
+            text-shadow:0 0 10px #19d3c5;
+        }
+
+        /* Responsive */
+        @media(max-width:768px){
+            .hall-card{
+                width:85%;
+            }
+        }
+        @keyframes bgZoom{
+    from{ background-size:100%; }
+    to{ background-size:110%; }
+}
+    </style>
+
+</head>
+
+<body>
+
+<h1 class="title">🎟 College Seminar Hall Booking</h1>
+
+<div class="hall-container">
+
+    <div class="hall-card" onclick="location.href='/booking/Seminar Hall 1'">
+        <h2>Seminar Hall 1</h2>
+        <p>Capacity: 150</p>
+    </div>
+
+    <div class="hall-card" onclick="location.href='/booking/Seminar Hall 2'">
+        <h2>Seminar Hall 2</h2>
+        <p>Capacity: 120</p>
+    </div>
+
+    <div class="hall-card" onclick="location.href='/booking/TECH HIVE'">
+        <h2>TECH HIVE</h2>
+        <p>Capacity: 200</p>
+    </div>
+
+</div>
+
+<a href="/admin" class="admin-link">View Admin Panel</a>
+
+</body>
+</html>
